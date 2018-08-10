@@ -1,0 +1,39 @@
+DROP PROCEDURE IF EXISTS ROWPERROW;
+DELIMITER ;;
+CREATE PROCEDURE ROWPERROW()
+	BEGIN
+        DECLARE my_num_rows INT(11);
+        DECLARE my_column_name VARCHAR(255);
+        DECLARE my_ttable_name VARCHAR(255);
+        DECLARE my_column_type VARCHAR(255);
+        DECLARE my_i INT(11);
+        DECLARE my_done INT DEFAULT FALSE;
+        DECLARE my_names cursor for
+        SELECT COLUMN_NAME, TABLE_NAME, COLUMN_TYPE
+        FROM INFORMATION_SCHEMA.COLUMNS 
+        WHERE COLUMN_DEFAULT IS NULL and IS_NULLABLE='NO' AND table_schema='novademo_4discoverazerbaijan' AND COLUMN_KEY<>'PRI';
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET my_done=TRUE;
+		OPEN my_names;
+        select FOUND_ROWS() into my_num_rows;
+        SET my_i = 1;
+
+b_loop: while my_i < my_num_rows do
+	IF my_done THEN
+      LEAVE b_loop;
+    END IF;
+    FETCH my_names INTO my_column_name, my_ttable_name, my_column_type;  
+    
+    set @s = CONCAT('Alter TABLE ', my_ttable_name, ' change COLUMN ', my_column_name, ' ', my_column_name, ' ', my_column_type, ' null default null'); 
+    
+    PREPARE stmt1 FROM @s; 
+    EXECUTE stmt1; 
+    DEALLOCATE PREPARE stmt1; 
+    
+    SET my_i = my_i + 1;  
+END WHILE b_loop;
+CLOSE my_names;
+End;
+;;
+
+DELIMITER ;
+CALL ROWPERROW();
