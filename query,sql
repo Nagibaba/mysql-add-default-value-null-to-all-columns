@@ -11,7 +11,7 @@ CREATE PROCEDURE ROWPERROW()
         DECLARE my_names cursor for
         SELECT COLUMN_NAME, TABLE_NAME, COLUMN_TYPE
         FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE COLUMN_DEFAULT IS NULL and IS_NULLABLE='NO' AND table_schema='novademo_4discoverazerbaijan' AND COLUMN_KEY<>'PRI';
+        WHERE COLUMN_DEFAULT IS NULL and IS_NULLABLE='NO' AND table_schema='my_db_name' AND COLUMN_KEY<>'PRI';
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET my_done=TRUE;
 		OPEN my_names;
         select FOUND_ROWS() into my_num_rows;
